@@ -8,8 +8,8 @@
   // 攤平：每章先放一張章名分隔頁，再放內容頁
   const flat = [];
   DECK.forEach((chap, ci) => {
-    flat.push({ type: 'divider', ch: chap.ch, color: chap.color, title: chap.title, sections: chap.sections });
-    chap.slides.forEach(s => flat.push(Object.assign({ type: 'slide', ch: chap.ch, color: chap.color }, s)));
+    flat.push({ isDivider: true, type: 'divider', ch: chap.ch, color: chap.color, title: chap.title, sections: chap.sections });
+    chap.slides.forEach(s => flat.push(Object.assign({ isDivider: false, ch: chap.ch, color: chap.color }, s)));
   });
 
   let idx = 0;
@@ -173,13 +173,22 @@
   // ---- 封面章節卡 ----
   (function buildCover() {
     const host = $('coverChapters');
+    host.innerHTML = '';
     DECK.forEach(c => {
       const card = document.createElement('div');
       card.className = 'cover-card';
       card.style.setProperty('--ct', c.color);
+      card.style.cursor = 'pointer';
       card.innerHTML = `<div class="cc-num">第 ${c.ch} 章</div>
         <div class="cc-title">${c.title}</div>
         <div class="cc-list">${c.sections.join('　')}</div>`;
+      card.onclick = () => {
+        $('cover').classList.add('hidden');
+        app.classList.remove('hidden');
+        fitPen();
+        const targetIdx = flat.findIndex(s => s.ch === c.ch);
+        go(targetIdx >= 0 ? targetIdx : 0);
+      };
       host.appendChild(card);
     });
   })();
@@ -194,17 +203,30 @@
       const head = document.createElement('div');
       head.className = 'toc-chead';
       head.innerHTML = `<span class="toc-dot"></span>第 ${chap.ch} 章　${chap.title}`;
-      head.onclick = () => wrap.classList.toggle('open');
+      head.onclick = () => {
+        wrap.classList.toggle('open');
+        const targetIdx = flat.findIndex(s => s.ch === chap.ch);
+        if (targetIdx >= 0) go(targetIdx);
+      };
       wrap.appendChild(head);
       const items = document.createElement('div');
       items.className = 'toc-items';
       flat.forEach((s, i) => {
-        if (s.type !== 'slide' || s.ch !== chap.ch) return;
+        if (s.isDivider || s.ch !== chap.ch) return;
         const b = document.createElement('button');
         b.className = 'toc-item';
         b.dataset.i = i;
-        b.innerHTML = `<span class="ti-sec">${s.sec}</span>${s.title}`;
-        b.onclick = () => { go(i); if (window.innerWidth <= 1080) tocEl.classList.remove('open'); };
+        const typeLabels = {
+          hook: '情境', explore: '探究', concept: '概念',
+          pitfall: '辨析', example: '典例', practice: '練習'
+        };
+        const typeBadge = typeLabels[s.type] ? `<span class="ti-pill type-${s.type}">${typeLabels[s.type]}</span>` : '';
+        b.innerHTML = `<span class="ti-sec">${s.sec}</span>${typeBadge}<span class="ti-txt">${s.title}</span>`;
+        b.onclick = (e) => {
+          e.stopPropagation();
+          go(i);
+          if (window.innerWidth <= 1080) tocEl.classList.remove('open');
+        };
         items.appendChild(b);
       });
       wrap.appendChild(items);

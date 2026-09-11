@@ -20,26 +20,40 @@ window.DECK = window.DECK || [];
       {
         sec: '10.2.1', secName: '複數的加法與減法',
         type: 'hook',
-        title: '虛數運算探索 — 實數運算律是否依然保持？',
+        title: '虛數乘法運算律動態檢驗儀',
+        inquiry: '拖動實數 k，動態展開 (k+i)² 檢驗分配律與平方公式在虛數中是否成立！',
         points: [
-          '數系擴充的首要準則是：原有運算律必須全部保持。',
-          '複數相加：實部與虛部分別相加即可。',
-          '乘法分配律：\\((1+i)^2 = 1 + 2i + i^2 = 2i\\)。'
+          '數系擴充的首要準則是：原有乘法運算律必須全部保持。',
+          '由乘法分配律展開：\\((k+i)^2 = k^2 + 2ki + i^2 = (k^2-1) + 2ki\\)。',
+          '實部為 \\(k^2-1\\)，虛部為 \\(2k\\)，依然為嚴整複數。'
         ],
         visual: (h) => {
-          h.innerHTML = SV.fbox([
-            { label: '加法結合律與交換律', tex: 'z_1 + z_2 = z_2 + z_1', color: C, fill: '#f0fdf4', size: 16, note: '實部與虛部獨立滿足加法交換律' },
-            { label: '乘法分配律驗證', tex: '(a+bi)(c+di) = ac + adi + bci + bdi^2', color: BLU, fill: '#eff6ff', size: 15, note: '關鍵代換：i² ＝ -1' },
-            { label: '代數化簡結果', tex: '= (ac - bd) + (ad + bc)i', color: AMB, size: 16, note: '依然是一個形式嚴整的複數' }
-          ]);
+          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
+            <div class="ictrl"><label>實數 k ＝ <span class="ival" id="kv">1.0</span>　(k+i)² ＝ <span class="ival" id="sqv">0.00 + 2.00i</span></label>
+            <input type="range" id="ks" min="-2" max="2" step="0.5" value="1"></div></div>`;
+          const draw = () => {
+            const k = +h.querySelector('#ks').value;
+            const re = k * k - 1;
+            const im = 2 * k;
+            h.querySelector('#kv').textContent = k.toFixed(1);
+            h.querySelector('#sqv').textContent = `${re >= 0 ? re.toFixed(2) : re.toFixed(2)} ${im >= 0 ? '+' : ''}${im.toFixed(2)}i`;
+
+            const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -3, xmax: 4, ymin: -4, ymax: 4, step: 1 });
+            const vOrig = SV.vector(P, 0, 0, k, 1, BLU, `k+i`, { fs: 12, ly: -6 });
+            const vSq = SV.vector(P, 0, 0, re, im, RED, `(k+i)²`, { fs: 12, ly: 12 });
+            const dot = SV.dot(P.X(re), P.Y(im), RED, 4.5);
+            h.querySelector('#fig').innerHTML = svg('0 0 440 270', P.defs + P.svg + vOrig + vSq + dot);
+          };
+          h.querySelector('#ks').oninput = draw;
+          draw();
         },
-        caption: '虛數的四則運算全面繼承了實數的交換律、結合律與分配律。'
+        caption: '藍色為初始複數 k+i，紅色為其平方展開後在複平面上的動態位置。'
       },
       {
         sec: '10.2.1', secName: '複數的加法與減法',
         type: 'explore',
-        title: '動態向量合成 — 複數加減法的幾何意義',
-        inquiry: '拖動滑桿調節 z₁ 與 z₂，觀察平行四邊形法則與兩點間距離！',
+        title: '複數加減向量合成與距離探究儀',
+        inquiry: '拖動 z₁ 與 z₂，切換加法平行四邊形法則與減法兩點歐氏距離！',
         points: [
           '加法 \\(z_1+z_2\\) 對應向量加法的<b>平行四邊形法則</b>。',
           '減法 \\(z_1-z_2\\) 對應從 \\(Z_2\\) 指向 \\(Z_1\\) 的向量。',
@@ -47,11 +61,18 @@ window.DECK = window.DECK || [];
         ],
         visual: (h) => {
           h.innerHTML = `<div style="width:100%"><div id="fig"></div>
-            <div class="ictrl"><label>z₁ 橫坐標 ＝ <span class="ival" id="x1v">2.0</span>　z₂ 橫坐標 ＝ <span class="ival" id="x2v">-1.0</span>　距離 |z₁-z₂| ＝ <span class="ival" id="dv">4.24</span></label>
-            <div style="display:flex;gap:12px;margin-top:4px">
-              <input type="range" id="x1s" min="-2" max="3" step="0.5" value="2" style="flex:1">
-              <input type="range" id="x2s" min="-3" max="2" step="0.5" value="-1" style="flex:1">
-            </div></div></div>`;
+            <div class="ictrl" style="gap:6px 14px">
+              <label>z₁ 橫坐標 ＝ <span class="ival" id="x1v">2.0</span>　z₂ 橫坐標 ＝ <span class="ival" id="x2v">-1.0</span>　距離 |z₁-z₂| ＝ <span class="ival" id="dv">4.24</span></label>
+              <div style="display:flex;gap:8px;width:100%">
+                <input type="range" id="x1s" min="-2" max="3" step="0.5" value="2" style="flex:1">
+                <input type="range" id="x2s" min="-3" max="2" step="0.5" value="-1" style="flex:1">
+              </div>
+              <div style="display:flex;gap:8px;margin-top:2px">
+                <button class="ibtn" id="opAdd" style="font-size:12px;padding:3px 12px">加法平行四邊形</button>
+                <button class="ibtn" id="opSub" style="font-size:12px;padding:3px 12px">減法兩點距離</button>
+              </div>
+            </div></div>`;
+          let opMode = 'add';
           const draw = () => {
             const x1 = +h.querySelector('#x1s').value, y1 = 2;
             const x2 = +h.querySelector('#x2s').value, y2 = -1;
@@ -64,23 +85,37 @@ window.DECK = window.DECK || [];
             const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -4, xmax: 4, ymin: -3, ymax: 4, step: 1 });
             const v1 = SV.vector(P, 0, 0, x1, y1, BLU, 'z₁', { lx: 8, ly: -6 });
             const v2 = SV.vector(P, 0, 0, x2, y2, AMB, 'z₂', { lx: 8, ly: 12 });
-            const vsum = SV.vector(P, 0, 0, sx, sy, GRN, 'z₁+z₂', { lx: 10, ly: -4 });
-            const p1 = SV.seg(P.X(x1), P.Y(y1), P.X(sx), P.Y(sy), '#94a3b8', 1.5, '3 3');
-            const p2 = SV.seg(P.X(x2), P.Y(y2), P.X(sx), P.Y(sy), '#94a3b8', 1.5, '3 3');
-            const diffLine = SV.seg(P.X(x2), P.Y(y2), P.X(x1), P.Y(y1), RED, 2.2, '4 3');
-            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + p1 + p2 + diffLine + v1 + v2 + vsum);
+            let layer = '';
+
+            if (opMode === 'add') {
+              const vsum = SV.vector(P, 0, 0, sx, sy, GRN, 'z₁+z₂', { lx: 10, ly: -4 });
+              const p1 = SV.seg(P.X(x1), P.Y(y1), P.X(sx), P.Y(sy), '#94a3b8', 1.5, '3 3');
+              const p2 = SV.seg(P.X(x2), P.Y(y2), P.X(sx), P.Y(sy), '#94a3b8', 1.5, '3 3');
+              layer = p1 + p2 + vsum;
+            } else {
+              const diffLine = SV.seg(P.X(x2), P.Y(y2), P.X(x1), P.Y(y1), RED, 2.4, '4 3');
+              const vdiff = SV.vector(P, 0, 0, x1 - x2, y1 - y2, RED, 'z₁-z₂', { lx: 10, ly: -4 });
+              const distNote = SV.vlabel((P.X(x1) + P.X(x2)) / 2 + 10, (P.Y(y1) + P.Y(y2)) / 2, `d=${dist.toFixed(2)}`, RED, 13);
+              layer = diffLine + vdiff + distNote;
+            }
+
+            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + layer + v1 + v2);
           };
+
           h.querySelector('#x1s').oninput = draw;
           h.querySelector('#x2s').oninput = draw;
+          h.querySelector('#opAdd').onclick = () => { opMode = 'add'; draw(); };
+          h.querySelector('#opSub').onclick = () => { opMode = 'sub'; draw(); };
           draw();
         },
-        caption: '綠色箭頭為和向量，紅色虛線連線長度即兩點距離 |z₁ - z₂|。'
+        caption: '可切換平行四邊形法則展示向量相加，或連線展示兩點距離 |z₁ - z₂|。'
       },
       /* ---------- 10.2.2 複數的乘法與除法 ---------- */
       {
         sec: '10.2.2', secName: '複數的乘法與除法',
         type: 'concept',
-        title: '複數乘除法則與二次方程求根',
+        title: '二次方程共軛虛根動態求根儀',
+        inquiry: '調節常數 q，觀察方程 x² - 2x + q = 0 的判別式 Δ 與共軛虛根分裂！',
         formula: { label: '除法分母實數化', tex: '\\frac{a+bi}{c+di} = \\frac{(a+bi)(c-di)}{c^2+d^2} = \\frac{ac+bd}{c^2+d^2} + \\frac{bc-ad}{c^2+d^2}i' },
         points: [
           '<b>乘法法則</b>：按多項式乘法展開並代入 \\(i^2=-1\\)。',
@@ -89,13 +124,39 @@ window.DECK = window.DECK || [];
           '實系數方程 \\(\\Delta < 0\\) 時，兩根為一對<b>共軛虛根</b>。'
         ],
         visual: (h) => {
-          h.innerHTML = SV.fbox([
-            { label: '共軛相乘模平方', tex: 'z \\cdot \\bar{z} = (a+bi)(a-bi) = a^2 + b^2 = |z|^2', color: C, fill: '#f0fdf4', size: 15 },
-            { label: '分母實數化法寶', tex: '\\frac{1}{c+di} = \\frac{c-di}{c^2+d^2}', color: BLU, fill: '#eff6ff', size: 16 },
-            { label: '實系數二次方程共軛虛根 (Δ < 0)', tex: 'x = \\frac{-b \\pm i\\sqrt{4ac-b^2}}{2a}', color: RED, size: 16, note: '虛根成對出現且互為共軛' }
-          ]);
+          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
+            <div class="ictrl"><label>常數 q ＝ <span class="ival" id="qv">5.0</span>　判別式 Δ ＝ <span class="ival" id="deltav">-16.0</span></label>
+            <input type="range" id="qs" min="-1" max="5" step="1" value="5"></div></div>`;
+          const draw = () => {
+            const q = +h.querySelector('#qs').value;
+            const delta = 4 - 4 * q;
+            h.querySelector('#qv').textContent = q.toFixed(1);
+            h.querySelector('#deltav').textContent = delta.toFixed(1);
+
+            const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -2, xmax: 4, ymin: -3, ymax: 3, step: 1 });
+            let rootsSvg = '';
+            if (delta > 0) {
+              const r1 = 1 + Math.sqrt(delta) / 2;
+              const r2 = 1 - Math.sqrt(delta) / 2;
+              rootsSvg += SV.dot(P.X(r1), P.Y(0), GRN, 5) + SV.dot(P.X(r2), P.Y(0), GRN, 5);
+              rootsSvg += SV.vlabel(P.X(r1), P.Y(0) - 8, `x₁=${r1.toFixed(1)}`, GRN, 12, { anchor: 'middle' });
+              rootsSvg += SV.vlabel(P.X(r2), P.Y(0) - 8, `x₂=${r2.toFixed(1)}`, GRN, 12, { anchor: 'middle' });
+            } else if (delta === 0) {
+              rootsSvg += SV.dot(P.X(1), P.Y(0), AMB, 5);
+              rootsSvg += SV.vlabel(P.X(1), P.Y(0) - 8, '重根 x=1', AMB, 12, { anchor: 'middle' });
+            } else {
+              const im = Math.sqrt(-delta) / 2;
+              rootsSvg += SV.dot(P.X(1), P.Y(im), RED, 5) + SV.dot(P.X(1), P.Y(-im), RED, 5);
+              rootsSvg += SV.seg(P.X(1), P.Y(im), P.X(1), P.Y(-im), '#94a3b8', 1.6, '3 3');
+              rootsSvg += SV.vlabel(P.X(1) + 8, P.Y(im) + 4, `1+${im.toFixed(1)}i`, RED, 12);
+              rootsSvg += SV.vlabel(P.X(1) + 8, P.Y(-im) + 4, `1-${im.toFixed(1)}i`, RED, 12);
+            }
+            h.querySelector('#fig').innerHTML = svg('0 0 440 270', P.defs + P.svg + rootsSvg);
+          };
+          h.querySelector('#qs').oninput = draw;
+          draw();
         },
-        caption: '共軛複數是分母實數化與二次方程求根的橋樑。'
+        caption: '當 Δ < 0 時，兩實根垂直分裂脫離實軸，在複平面形成共軛虛根對。'
       },
       {
         sec: '10.2.2', secName: '複數的乘法與除法',
@@ -135,7 +196,8 @@ window.DECK = window.DECK || [];
       {
         sec: '10.2.2', secName: '複數的乘法與除法',
         type: 'example',
-        title: '典例剖析 — 複數除法化簡與方程求解',
+        title: '典例剖析 — 複數除法化簡與方程求解儀',
+        inquiry: '拖動滑桿調節除數虛部，觀察分母乘以共軛複數實數化的動態過程！',
         example: {
           q: '計算複數 \\(z = \\frac{1+3i}{1-i}\\) 的代數形式，並在複數範圍內解方程 \\(x^2 - 2x + 5 = 0\\)。',
           thinking: '除法分子分母同乘分母共軛 1+i；二次方程用配方法或求根公式。',
@@ -157,15 +219,27 @@ window.DECK = window.DECK || [];
           }
         },
         visual: (h) => {
-          const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -2, xmax: 4, ymin: -3, ymax: 3, step: 1 });
-          const r1 = SV.dot(P.X(1), P.Y(2), RED, 5);
-          const r2 = SV.dot(P.X(1), P.Y(-2), RED, 5);
-          const v1 = SV.vlabel(P.X(1) + 10, P.Y(2) + 4, 'x₁ = 1 + 2i', RED, 13);
-          const v2 = SV.vlabel(P.X(1) + 10, P.Y(-2) + 4, 'x₂ = 1 - 2i', RED, 13);
-          const symm = SV.seg(P.X(1), P.Y(2), P.X(1), P.Y(-2), '#94a3b8', 1.6, '3 3');
-          h.innerHTML = svg('0 0 440 270', P.defs + P.svg + symm + r1 + r2 + v1 + v2);
+          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
+            <div class="ictrl"><label>分母共軛乘積：|分母|² ＝ <span class="ival" id="denv">2.0</span>　商向量 z ＝ <span class="ival" id="ansv">-1.0 + 2.0i</span></label>
+            <input type="range" id="ds" min="0.5" max="2.5" step="0.5" value="1"></div></div>`;
+          const draw = () => {
+            const d = +h.querySelector('#ds').value;
+            const den = 1 + d * d;
+            const re = (1 - 3 * d) / den;
+            const im = (3 + d) / den;
+            h.querySelector('#denv').textContent = den.toFixed(2);
+            h.querySelector('#ansv').textContent = `${re.toFixed(1)} + ${im.toFixed(1)}i`;
+
+            const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -3, xmax: 3, ymin: -2, ymax: 4, step: 1 });
+            const vNum = SV.vector(P, 0, 0, 1, 3, BLU, '分子 1+3i', { fs: 11, ly: -6 });
+            const vDen = SV.vector(P, 0, 0, 1, -d, AMB, `分母 1-${d}i`, { fs: 11, ly: 12 });
+            const vRes = SV.vector(P, 0, 0, re, im, RED, `商 z`, { fs: 12, ly: -8 });
+            h.querySelector('#fig').innerHTML = svg('0 0 440 270', P.defs + P.svg + vNum + vDen + vRes);
+          };
+          h.querySelector('#ds').oninput = draw;
+          draw();
         },
-        caption: '實系數二次方程的兩虛根互為共軛複數，幾何上關於實軸對稱。'
+        caption: '動態展示除數在分母實數化下的幾何旋轉與模長壓縮效果。'
       },
       {
         sec: '10.2.2', secName: '複數的乘法與除法',

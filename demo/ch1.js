@@ -20,39 +20,74 @@ window.DECK = window.DECK || [];
       {
         sec: '10.1.1', secName: '複數的概念',
         type: 'hook',
-        title: '負數開方之謎 — 數系為何必須再次擴充？',
+        title: '負數開方與數系擴充探究儀',
+        inquiry: '拖動滑桿調節常數 c，觀察方程 x² + c = 0 的解由實根轉化為虛根！',
         points: [
-          '實數範圍內，任何數的平方均為非負數。',
-          '求解二次方程 \\(x^2=-1\\) 或卡爾丹公式遇到開負數平方根。',
-          '為打破運算邊界，數學家大膽引入虛數單位 \\(i\\)。'
+          '實數範圍內，非負數平方為非負，負數無法開平方。',
+          '當 \\(c \\le 0\\) 時，拋物線與 \\(x\\) 軸相交，具備實數根。',
+          '當 \\(c > 0\\) 時，拋物線脫離實軸，在虛軸上誕生共軛虛根。'
         ],
         visual: (h) => {
-          const P = SV.plane({ x0: 45, y0: 25, w: 350, h: 215, xmin: -3, xmax: 3, ymin: -1, ymax: 5, step: 1 });
-          const parabola = SV.func(P, x => x * x + 1, [-2.1, 2.1], { color: C, w: 2.8 });
-          const vertex = SV.dot(P.X(0), P.Y(1), RED, 5);
-          const lbl = SV.vlabel(P.X(0) + 12, P.Y(1) + 4, '頂點 (0,1)', RED, 13);
-          const note = SV.vlabel(P.X(0), P.Y(-0.6), '曲線與 x 軸無交點 → 實數範圍無解', '#64748b', 12, { anchor: 'middle' });
-          h.innerHTML = svg('0 0 440 270', P.defs + P.svg + parabola + vertex + lbl + note);
+          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
+            <div class="ictrl"><label>常數 c ＝ <span class="ival" id="cv">1.0</span>　方程狀態：<span class="ival" id="st">虛軸共軛根 ±1.00i</span></label>
+            <input type="range" id="cs" min="-3" max="3" step="0.5" value="1"></div></div>`;
+          const draw = () => {
+            const c = +h.querySelector('#cs').value;
+            h.querySelector('#cv').textContent = c.toFixed(1);
+            const stEl = h.querySelector('#st');
+            const P = SV.plane({ x0: 45, y0: 25, w: 350, h: 215, xmin: -3, xmax: 3, ymin: -3, ymax: 5, step: 1, xLabel: 'x', yLabel: 'y' });
+            const curve = SV.func(P, x => x * x + c, [-2.4, 2.4], { color: C, w: 2.6 });
+            let extras = '';
+            if (c < 0) {
+              const r = Math.sqrt(-c);
+              stEl.textContent = `實根 x = ±${r.toFixed(2)}`;
+              extras += SV.dot(P.X(r), P.Y(0), GRN, 5) + SV.dot(P.X(-r), P.Y(0), GRN, 5);
+              extras += SV.vlabel(P.X(r), P.Y(0) - 10, `+${r.toFixed(1)}`, GRN, 12, { anchor: 'middle' });
+              extras += SV.vlabel(P.X(-r), P.Y(0) - 10, `-${r.toFixed(1)}`, GRN, 12, { anchor: 'middle' });
+            } else if (c === 0) {
+              stEl.textContent = '重根 x = 0';
+              extras += SV.dot(P.X(0), P.Y(0), AMB, 5);
+            } else {
+              const ir = Math.sqrt(c);
+              stEl.textContent = `虛根 x = ±${ir.toFixed(2)}i (虛軸)`;
+              extras += SV.dot(P.X(0), P.Y(ir), RED, 5) + SV.dot(P.X(0), P.Y(-ir), RED, 5);
+              extras += SV.vlabel(P.X(0) + 8, P.Y(ir) + 4, `+${ir.toFixed(1)}i`, RED, 12);
+              extras += SV.vlabel(P.X(0) + 8, P.Y(-ir) + 4, `-${ir.toFixed(1)}i`, RED, 12);
+              extras += SV.seg(P.X(0), P.Y(-ir), P.X(0), P.Y(ir), RED, 1.8, '3 3');
+            }
+            h.querySelector('#fig').innerHTML = svg('0 0 440 270', P.defs + P.svg + curve + extras);
+          };
+          h.querySelector('#cs').oninput = draw;
+          draw();
         },
-        caption: '方程 x² + 1 = 0 在實數軸上無交點，呼喚全新數系誕生。'
+        caption: '紅色虛線點展示實數方程無解時，在複數域虛軸上自然顯現的共軛根。'
       },
       {
         sec: '10.1.1', secName: '複數的概念',
         type: 'explore',
-        title: '動態複平面 — 實部與虛部決定點與向量',
-        inquiry: '拖動實部 a 與虛部 b 滑桿，觀察點 Z、向量與模長的動態變化！',
+        title: '複平面動態幾何與軌跡探究儀',
+        inquiry: '拖動實部 a 與虛部 b，切換不同幾何視角探究點、向量與軌跡！',
         points: [
-          '複數 \\(z=a+bi\\) 與平面上的點 \\(Z(a,b)\\) 一一對應。',
-          '複數 \\(z\\) 對應以原點為起點的向量 \\(\\vec{OZ}=(a,b)\\)。',
-          '模長 \\(|z|=\\sqrt{a^2+b^2}\\) 即點 \\(Z\\) 到原點的距離。'
+          '複數 \\(z=a+bi\\) 與點 \\(Z(a,b)\\) 及向量 \\(\\vec{OZ}\\) 一一對應。',
+          '共軛複數 \\(\\bar{z}=a-bi\\) 與 \\(z\\) 永遠關於實軸對稱。',
+          '方程 \\(|z|=r\\) 的幾何圖形是以原點為圓心、\\(r\\) 為半徑的圓。'
         ],
         visual: (h) => {
           h.innerHTML = `<div style="width:100%"><div id="fig"></div>
-            <div class="ictrl"><label>實部 a ＝ <span class="ival" id="av">2.0</span>　虛部 b ＝ <span class="ival" id="bv">2.0</span>　模長 |z| ＝ <span class="ival" id="mv">2.83</span></label>
-            <div style="display:flex;gap:12px;margin-top:4px">
-              <input type="range" id="as" min="-3" max="3" step="0.5" value="2" style="flex:1">
-              <input type="range" id="bs" min="-3" max="3" step="0.5" value="2" style="flex:1">
-            </div></div></div>`;
+            <div class="ictrl" style="gap:6px 14px">
+              <label>實部 a ＝ <span class="ival" id="av">2.0</span>　虛部 b ＝ <span class="ival" id="bv">2.0</span>　模長 |z| ＝ <span class="ival" id="mv">2.83</span></label>
+              <div style="display:flex;gap:8px;width:100%">
+                <input type="range" id="as" min="-3" max="3" step="0.5" value="2" style="flex:1">
+                <input type="range" id="bs" min="-3" max="3" step="0.5" value="2" style="flex:1">
+              </div>
+              <div style="display:flex;gap:6px;margin-top:2px">
+                <button class="ibtn" id="mVec" style="font-size:11.5px;padding:3px 9px">點與向量</button>
+                <button class="ibtn" id="mConj" style="font-size:11.5px;padding:3px 9px">共軛對稱</button>
+                <button class="ibtn" id="mCircle" style="font-size:11.5px;padding:3px 9px">同模圓軌跡</button>
+                <button class="ibtn" id="mRing" style="font-size:11.5px;padding:3px 9px">圓環區域</button>
+              </div>
+            </div></div>`;
+          let mode = 'all';
           const draw = () => {
             const a = +h.querySelector('#as').value;
             const b = +h.querySelector('#bs').value;
@@ -63,22 +98,45 @@ window.DECK = window.DECK || [];
 
             const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -4, xmax: 4, ymin: -4, ymax: 4, step: 1 });
             const zx = P.X(a), zy = P.Y(b), ox = P.X(0), oy = P.Y(0);
-            const projX = SV.seg(zx, zy, zx, oy, '#94a3b8', 1.8, '4 3');
-            const projY = SV.seg(zx, zy, ox, zy, '#94a3b8', 1.8, '4 3');
-            const vec = SV.vector(P, 0, 0, a, b, C, `Z(${a}, ${b})`, { fs: 13 });
-            const circle = `<circle cx="${ox}" cy="${oy}" r="${(mod * (340 / 8)).toFixed(1)}" fill="none" stroke="${AMB}" stroke-width="1.2" stroke-dasharray="3 3"/>`;
-            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + circle + projX + projY + vec);
+            let layer = '';
+
+            if (mode === 'ring') {
+              const r1 = 1.5 * (340 / 8), r2 = 3.0 * (340 / 8);
+              layer += `<circle cx="${ox}" cy="${oy}" r="${r2}" fill="rgba(37,99,235,0.12)" stroke="${C}" stroke-width="1.6"/>`;
+              layer += `<circle cx="${ox}" cy="${oy}" r="${r1}" fill="#fff" stroke="${RED}" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+              layer += SV.vlabel(P.X(1.8), P.Y(2.2), '1.5 < |z| ≤ 3', C, 12);
+            } else if (mode === 'circle' || mode === 'all') {
+              layer += `<circle cx="${ox}" cy="${oy}" r="${(mod * (340 / 8)).toFixed(1)}" fill="rgba(217,119,6,0.06)" stroke="${AMB}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+            }
+
+            if (mode === 'conj' || mode === 'all') {
+              const czx = P.X(a), czy = P.Y(-b);
+              layer += SV.vector(P, 0, 0, a, -b, GRN, `z̄(${a},${-b})`, { fs: 12, ly: 14 });
+              layer += SV.seg(zx, zy, czx, czy, '#94a3b8', 1.4, '3 3');
+            }
+
+            const projX = SV.seg(zx, zy, zx, oy, '#94a3b8', 1.6, '3 3');
+            const projY = SV.seg(zx, zy, ox, zy, '#94a3b8', 1.6, '3 3');
+            const vec = SV.vector(P, 0, 0, a, b, C, `Z(${a}, ${b})`, { fs: 13, ly: -8 });
+
+            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + layer + projX + projY + vec);
           };
+
           h.querySelector('#as').oninput = draw;
           h.querySelector('#bs').oninput = draw;
+          h.querySelector('#mVec').onclick = () => { mode = 'vec'; draw(); };
+          h.querySelector('#mConj').onclick = () => { mode = 'conj'; draw(); };
+          h.querySelector('#mCircle').onclick = () => { mode = 'circle'; draw(); };
+          h.querySelector('#mRing').onclick = () => { mode = 'ring'; draw(); };
           draw();
         },
-        caption: '虛軸代表虛部單位，琥珀色虛線圓代表相同模長的複數軌跡。'
+        caption: '支援點選按鈕切換共軛對稱、同模圓軌跡與教材 10.1.2 節圓環區域。'
       },
       {
         sec: '10.1.1', secName: '複數的概念',
         type: 'concept',
-        title: '複數的形式化定義與數系結構',
+        title: '複數形式化定義與動態分類機',
+        inquiry: '調節 a 與 b，實時檢測當前複數所屬分類與共軛特徵！',
         formula: { label: '複數代數形式', tex: 'z = a + bi \\quad (a, b \\in \\mathbb{R})' },
         points: [
           '\\(a\\) 為<b>實部</b> \\(\\mathrm{Re}\\)，\\(b\\) 為<b>虛部</b> \\(\\mathrm{Im}\\)。',
@@ -87,14 +145,36 @@ window.DECK = window.DECK || [];
           '共軛複數：\\(\\bar{z}=a-bi\\)，兩點關於實軸對稱。'
         ],
         visual: (h) => {
-          h.innerHTML = SV.fbox([
-            { label: '實數 (b = 0)', tex: 'z = a \\in \\mathbb{R}', color: GRN, fill: '#f0fdf4', size: 16, note: '實數集是複數集的真子集' },
-            { label: '虛數 (b ≠ 0)', tex: 'z = a + bi \\quad (b \\neq 0)', color: C, fill: '#eff6ff', size: 16, note: '包含純虛數與非純虛數' },
-            { label: '純虛數 (a = 0, b ≠ 0)', tex: 'z = bi \\quad (b \\neq 0)', color: VIO, fill: '#f5f3ff', size: 16, note: '點落在虛軸上且非原點' },
-            { label: '共軛複數', tex: '\\bar{z} = a - bi \\implies |z| = |\\bar{z}|', color: AMB, size: 16, note: '實部相等、虛部互為相反數' }
-          ]);
+          h.innerHTML = `<div style="width:100%"><div id="fbox"></div>
+            <div class="ictrl"><label>微調：a ＝ <span class="ival" id="ca">0.0</span>　b ＝ <span class="ival" id="cb">2.0</span>　類別：<span class="ival" id="cat">純虛數</span></label>
+            <div style="display:flex;gap:10px;width:100%">
+              <input type="range" id="cas" min="-2" max="2" step="1" value="0" style="flex:1">
+              <input type="range" id="cbs" min="-2" max="2" step="1" value="2" style="flex:1">
+            </div></div></div>`;
+          const draw = () => {
+            const a = +h.querySelector('#cas').value;
+            const b = +h.querySelector('#cbs').value;
+            h.querySelector('#ca').textContent = a.toFixed(1);
+            h.querySelector('#cb').textContent = b.toFixed(1);
+
+            let cat = '一般虛數', tagColor = C;
+            if (b === 0) { cat = '實數 (b=0)'; tagColor = GRN; }
+            else if (a === 0 && b !== 0) { cat = '純虛數 (a=0, b≠0)'; tagColor = VIO; }
+            h.querySelector('#cat').textContent = cat;
+            h.querySelector('#cat').style.color = tagColor;
+
+            h.querySelector('#fbox').innerHTML = SV.fbox([
+              { label: '當前數式', tex: `z = ${a} + (${b})i`, color: tagColor, fill: '#f8fafc', size: 18, note: `當前判定：${cat}` },
+              { label: '實部與虛部', tex: `\\mathrm{Re}(z)=${a}, \\; \\mathrm{Im}(z)=${b}`, color: C, size: 15 },
+              { label: '共軛複數', tex: `\\bar{z} = ${a} - (${b})i`, color: AMB, size: 15 }
+            ]);
+            if (window.MJ) window.MJ(h.querySelector('#fbox'));
+          };
+          h.querySelector('#cas').oninput = draw;
+          h.querySelector('#cbs').oninput = draw;
+          draw();
         },
-        caption: '數系劃分結構清楚規範了實數、虛數與純虛數的充要條件。'
+        caption: '動態滑桿即時判定複數的三大分類：實數、虛數與純虛數。'
       },
       {
         sec: '10.1.1', secName: '複數的概念',
@@ -135,7 +215,8 @@ window.DECK = window.DECK || [];
       {
         sec: '10.1.2', secName: '複數的幾何意義',
         type: 'example',
-        title: '典例剖析 — 參數討論求純虛數與模長',
+        title: '典例剖析 — 參數討論求純虛數動態儀',
+        inquiry: '拖動參數 m，動態觀察點 Z 在複平面的位置移動與純虛數成立條件！',
         example: {
           q: '已知複數 \\(z = (m^2-1) + (m+1)i\\)（\\(m \\in \\mathbb{R}\\)），若 \\(z\\) 為純虛數，求實數 \\(m\\) 的值及模長 \\(|z|\\)。',
           thinking: '純虛數條件是「實部為 0 且虛部不為 0」，務必檢驗虛部非零！',
@@ -157,14 +238,35 @@ window.DECK = window.DECK || [];
           }
         },
         visual: (h) => {
-          const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -3, xmax: 3, ymin: -1, ymax: 3, step: 1 });
-          const dot = SV.dot(P.X(0), P.Y(2), RED, 5);
-          const vec = SV.vector(P, 0, 0, 0, 2, C, 'Z(0,2)', { lx: 14, ly: 0 });
-          const arc = `<circle cx="${P.X(0)}" cy="${P.Y(0)}" r="${(2 * (340 / 6)).toFixed(1)}" fill="none" stroke="${GRN}" stroke-width="1.8" stroke-dasharray="4 3"/>`;
-          const note = SV.vlabel(P.X(1.5), P.Y(2.2), '軌跡 |z| = 2', GRN, 13);
-          h.innerHTML = svg('0 0 440 270', P.defs + P.svg + arc + dot + vec + note);
+          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
+            <div class="ictrl"><label>參數 m ＝ <span class="ival" id="mv">1.0</span>　點 Z 坐標：<span class="ival" id="zv">(0.0, 2.0)</span></label>
+            <input type="range" id="ms" min="-2" max="2" step="0.5" value="1"></div></div>`;
+          const draw = () => {
+            const m = +h.querySelector('#ms').value;
+            const re = m * m - 1;
+            const im = m + 1;
+            h.querySelector('#mv').textContent = m.toFixed(1);
+            h.querySelector('#zv').textContent = `(${re.toFixed(1)}, ${im.toFixed(1)})`;
+
+            const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -2, xmax: 4, ymin: -1, ymax: 4, step: 1 });
+            let statusNote = '';
+            let dotCol = C;
+            if (m === 1) {
+              statusNote = SV.vlabel(P.X(0) + 12, P.Y(2) - 6, 'm=1 純虛數 Z(0,2)', RED, 13);
+              dotCol = RED;
+            } else if (m === -1) {
+              statusNote = SV.vlabel(P.X(0) + 12, P.Y(0) + 14, 'm=-1 原點(實數0，排除)', AMB, 12);
+              dotCol = AMB;
+            }
+
+            const vec = SV.vector(P, 0, 0, re, im, dotCol, `Z(${re.toFixed(1)},${im.toFixed(1)})`, { fs: 12 });
+            const circle = m === 1 ? `<circle cx="${P.X(0)}" cy="${P.Y(0)}" r="${(2 * (340 / 6)).toFixed(1)}" fill="none" stroke="${GRN}" stroke-width="1.8" stroke-dasharray="4 3"/>` : '';
+            h.querySelector('#fig').innerHTML = svg('0 0 440 270', P.defs + P.svg + circle + vec + statusNote);
+          };
+          h.querySelector('#ms').oninput = draw;
+          draw();
         },
-        caption: '純虛數 Z(0,2) 位於虛軸正半軸上，模長即為點到原點距離 2。'
+        caption: '拖動 m 至 1 時點剛好落入虛軸 (0,2)，拖至 -1 落在原點為實數 0。'
       },
       {
         sec: '10.1.2', secName: '複數的幾何意義',
