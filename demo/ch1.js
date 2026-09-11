@@ -1,9 +1,9 @@
-/* ============ 第 1 章　導數的概念與幾何意義 (示範章節) ============
-   依高中數學新課標：10.1.1 瞬時變化率與導數、10.1.2 導數的幾何意義
+/* ============ 第 1 單元　10.1 複數的概念與幾何意義 ============
+   教材來源：普通高中教科書 數學(B版) 必修第四冊 第十章
    ============================================================ */
 window.DECK = window.DECK || [];
 (function () {
-  const C = '#2563eb';
+  const C = '#2563eb'; // 主題色：科技藍
   const RED = '#e11d48', GRN = '#059669', BLU = '#2563eb', VIO = '#7c3aed', AMB = '#d97706';
 
   function svg(vb, inner) {
@@ -12,173 +12,194 @@ window.DECK = window.DECK || [];
 
   window.DECK.push({
     ch: 1,
-    title: '導數的概念與幾何意義',
+    title: '複數的概念與幾何意義',
     color: C,
-    sections: ['10.1.1 瞬時變化率與導數', '10.1.2 導數的幾何意義'],
+    sections: ['10.1.1 複數的概念', '10.1.2 複數的幾何意義'],
     slides: [
-      /* ---------- 10.1.1 瞬時變化率與導數 ---------- */
+      /* ---------- 10.1.1 複數的概念 ---------- */
       {
-        sec: '10.1.1', secName: '瞬時變化率與導數',
+        sec: '10.1.1', secName: '複數的概念',
         type: 'hook',
-        title: '特定瞬間的速度該如何精準衡量？',
+        title: '負數開方之謎 — 數系為何必須再次擴充？',
         points: [
-          '平均速度反映一段時間內的總體快慢：\\(\\bar{v}=\\frac{\\Delta s}{\\Delta t}\\)。',
-          '在某一具體時刻（如車輛碰撞前瞬間），物體的<b>瞬時速度</b>是多少？',
-          '矛盾：當 \\(\\Delta t = 0\\) 時，分母為零，公式失去算術意義！'
+          '實數範圍內，任何數的平方均為非負數。',
+          '求解二次方程 \\(x^2=-1\\) 或卡爾丹公式遇到開負數平方根。',
+          '為打破運算邊界，數學家大膽引入虛數單位 \\(i\\)。'
         ],
         visual: (h) => {
-          h.innerHTML = svg('0 0 440 270', `
-            ${SV.plane({ x0: 50, y0: 30, w: 340, h: 200, xmin: 0, xmax: 5, ymin: 0, ymax: 25, step: 1, xLabel: 't(s)', yLabel: 's(m)' }).defs}
-            ${SV.plane({ x0: 50, y0: 30, w: 340, h: 200, xmin: 0, xmax: 5, ymin: 0, ymax: 25, step: 1, xLabel: 't(s)', yLabel: 's(m)' }).svg}
-            ${SV.func(SV.plane({ x0: 50, y0: 30, w: 340, h: 200, xmin: 0, xmax: 5, ymin: 0, ymax: 25 }), t => t * t, [0, 4.8], { color: C, w: 2.6 })}
-            ${SV.dot(186, 174, RED, 5)}
-            ${SV.vlabel(196, 170, 't=2時刻', RED, 13)}
-          `);
+          const P = SV.plane({ x0: 45, y0: 25, w: 350, h: 215, xmin: -3, xmax: 3, ymin: -1, ymax: 5, step: 1 });
+          const parabola = SV.func(P, x => x * x + 1, [-2.1, 2.1], { color: C, w: 2.8 });
+          const vertex = SV.dot(P.X(0), P.Y(1), RED, 5);
+          const lbl = SV.vlabel(P.X(0) + 12, P.Y(1) + 4, '頂點 (0,1)', RED, 13);
+          const note = SV.vlabel(P.X(0), P.Y(-0.6), '曲線與 x 軸無交點 → 實數範圍無解', '#64748b', 12, { anchor: 'middle' });
+          h.innerHTML = svg('0 0 440 270', P.defs + P.svg + parabola + vertex + lbl + note);
         },
-        caption: '高空自由落體：時間越縮短，平均速度越接近該時刻的真實快慢。'
+        caption: '方程 x² + 1 = 0 在實數軸上無交點，呼喚全新數系誕生。'
       },
       {
-        sec: '10.1.1', secName: '瞬時變化率與導數',
+        sec: '10.1.1', secName: '複數的概念',
         type: 'explore',
-        title: '時間間隔無限縮小，平均速度趨於穩定極限',
-        inquiry: '請拖動滑桿縮減時間間隔 Δt，觀察平均速度 Δs/Δt 的數值收斂趨勢！',
+        title: '動態複平面 — 實部與虛部決定點與向量',
+        inquiry: '拖動實部 a 與虛部 b 滑桿，觀察點 Z、向量與模長的動態變化！',
         points: [
-          '令位移公式為 \\(s(t)=t^2\\)，考察 \\(t_0=2\\) 時刻的運動。',
-          '當 \\(\\Delta t\\) 從 1 秒、0.1 秒到 0.01 秒，平均速度逼向固定常數 \\(4\\)。',
-          '這個極限值就是 \\(t=2\\) 時刻的<b>瞬時速度</b>。'
+          '複數 \\(z=a+bi\\) 與平面上的點 \\(Z(a,b)\\) 一一對應。',
+          '複數 \\(z\\) 對應以原點為起點的向量 \\(\\vec{OZ}=(a,b)\\)。',
+          '模長 \\(|z|=\\sqrt{a^2+b^2}\\) 即點 \\(Z\\) 到原點的距離。'
         ],
         visual: (h) => {
           h.innerHTML = `<div style="width:100%"><div id="fig"></div>
-            <div class="ictrl"><label>時間差 Δt ＝ <span class="ival" id="dtv">1.00</span> 秒　平均速度 ＝ <span class="ival" id="vv">5.00</span> m/s</label>
-            <input type="range" id="dts" min="0.05" max="2.0" step="0.05" value="1.00"></div></div>`;
-          const s = t => t * t;
-          const t0 = 2;
+            <div class="ictrl"><label>實部 a ＝ <span class="ival" id="av">2.0</span>　虛部 b ＝ <span class="ival" id="bv">2.0</span>　模長 |z| ＝ <span class="ival" id="mv">2.83</span></label>
+            <div style="display:flex;gap:12px;margin-top:4px">
+              <input type="range" id="as" min="-3" max="3" step="0.5" value="2" style="flex:1">
+              <input type="range" id="bs" min="-3" max="3" step="0.5" value="2" style="flex:1">
+            </div></div></div>`;
           const draw = () => {
-            const dt = +h.querySelector('#dts').value;
-            const avgV = (s(t0 + dt) - s(t0)) / dt;
-            h.querySelector('#dtv').textContent = dt.toFixed(2);
-            h.querySelector('#vv').textContent = avgV.toFixed(2);
+            const a = +h.querySelector('#as').value;
+            const b = +h.querySelector('#bs').value;
+            const mod = Math.sqrt(a * a + b * b);
+            h.querySelector('#av').textContent = a.toFixed(1);
+            h.querySelector('#bv').textContent = b.toFixed(1);
+            h.querySelector('#mv').textContent = mod.toFixed(2);
 
-            const P = SV.plane({ x0: 50, y0: 25, w: 340, h: 215, xmin: 0, xmax: 5, ymin: 0, ymax: 20, step: 1, xLabel: 't', yLabel: 's' });
-            const curve = SV.func(P, s, [0, 4.2], { color: C });
-            const sec = SV.secant(P, s, t0, t0 + dt, { color: RED, label1: 'P(2,4)', label2: 'Q' });
-            const tri = SV.diffTriangle(P, t0, s(t0), dt, s(t0 + dt) - s(t0));
-            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + curve + sec.svg + tri);
+            const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -4, xmax: 4, ymin: -4, ymax: 4, step: 1 });
+            const zx = P.X(a), zy = P.Y(b), ox = P.X(0), oy = P.Y(0);
+            const projX = SV.seg(zx, zy, zx, oy, '#94a3b8', 1.8, '4 3');
+            const projY = SV.seg(zx, zy, ox, zy, '#94a3b8', 1.8, '4 3');
+            const vec = SV.vector(P, 0, 0, a, b, C, `Z(${a}, ${b})`, { fs: 13 });
+            const circle = `<circle cx="${ox}" cy="${oy}" r="${(mod * (340 / 8)).toFixed(1)}" fill="none" stroke="${AMB}" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + circle + projX + projY + vec);
           };
-          h.querySelector('#dts').oninput = draw; draw();
+          h.querySelector('#as').oninput = draw;
+          h.querySelector('#bs').oninput = draw;
+          draw();
         },
-        caption: '極限思維：動態逼近中掌握確定不變的瞬時狀態。'
+        caption: '虛軸代表虛部單位，琥珀色虛線圓代表相同模長的複數軌跡。'
       },
       {
-        sec: '10.1.1', secName: '瞬時變化率與導數',
+        sec: '10.1.1', secName: '複數的概念',
         type: 'concept',
-        title: '導數的形式化定義：差商在極限下的值',
-        formula: { label: '導數定義式', tex: 'f\'(x_0) = \\lim_{\\Delta x \\to 0} \\frac{f(x_0+\\Delta x)-f(x_0)}{\\Delta x}' },
+        title: '複數的形式化定義與數系結構',
+        formula: { label: '複數代數形式', tex: 'z = a + bi \\quad (a, b \\in \\mathbb{R})' },
         points: [
-          '<b>核心本質</b>：函數增量 \\(\\Delta y\\) 與自變量增量 \\(\\Delta x\\) 之比的極限。',
-          '<b>記號體系</b>：記作 \\(f\'(x_0)\\) 或 \\(\\left.\\frac{\\mathrm{d}y}{\\mathrm{d}x}\\right|_{x=x_0}\\)。',
-          '若該極限存在，則稱函數在點 \\(x_0\\) 處<b>可導</b>。'
+          '\\(a\\) 為<b>實部</b> \\(\\mathrm{Re}\\)，\\(b\\) 為<b>虛部</b> \\(\\mathrm{Im}\\)。',
+          '當 \\(b=0\\) 時 \\(z\\) 為實數；當 \\(b \\neq 0\\) 時 \\(z\\) 為虛數。',
+          '當 \\(a=0\\) 且 \\(b \\neq 0\\) 時，\\(z\\) 稱為<b>純虛數</b>。',
+          '共軛複數：\\(\\bar{z}=a-bi\\)，兩點關於實軸對稱。'
         ],
         visual: (h) => {
           h.innerHTML = SV.fbox([
-            { label: '自變量增量', tex: '\\Delta x = x - x_0', color: C, fill: '#eff6ff', size: 17 },
-            { label: '函數增量', tex: '\\Delta y = f(x_0+\\Delta x) - f(x_0)', color: GRN, fill: '#f0fdf4', size: 17 },
-            { label: '平均變化率', tex: '\\frac{\\Delta y}{\\Delta x} = \\frac{f(x_0+\\Delta x)-f(x_0)}{\\Delta x}', color: AMB, size: 18, note: '差商反映兩點間總體變化' }
+            { label: '實數 (b = 0)', tex: 'z = a \\in \\mathbb{R}', color: GRN, fill: '#f0fdf4', size: 16, note: '實數集是複數集的真子集' },
+            { label: '虛數 (b ≠ 0)', tex: 'z = a + bi \\quad (b \\neq 0)', color: C, fill: '#eff6ff', size: 16, note: '包含純虛數與非純虛數' },
+            { label: '純虛數 (a = 0, b ≠ 0)', tex: 'z = bi \\quad (b \\neq 0)', color: VIO, fill: '#f5f3ff', size: 16, note: '點落在虛軸上且非原點' },
+            { label: '共軛複數', tex: '\\bar{z} = a - bi \\implies |z| = |\\bar{z}|', color: AMB, size: 16, note: '實部相等、虛部互為相反數' }
           ]);
         },
-        caption: '導數反映了因變量隨自變量變化的快慢程度。'
+        caption: '數系劃分結構清楚規範了實數、虛數與純虛數的充要條件。'
       },
       {
-        sec: '10.1.1', secName: '瞬時變化率與導數',
-        type: 'example',
-        title: '用定義法求函數在給定點的導數',
-        example: {
-          q: '利用導數定義，求函數 \\(f(x)=x^2\\) 在 \\(x=1\\) 處的導數 \\(f\'(1)\\)。',
-          thinking: '嚴格按照三步法：算增量 \\(\\Delta y\\) → 算差商 \\(\\frac{\\Delta y}{\\Delta x}\\) → 取極限。',
-          hints: [
-            '第一步：\\(\\Delta y = (1+\\Delta x)^2 - 1^2 = 2\\Delta x + (\\Delta x)^2\\)',
-            '第二步：分子分母約去 \\(\\Delta x\\) 得 \\(2+\\Delta x\\)'
-          ],
-          steps: [
-            '計算差商：\\(\\frac{f(1+\\Delta x)-f(1)}{\\Delta x} = \\frac{(1+\\Delta x)^2-1}{\\Delta x} = 2+\\Delta x\\)',
-            '取極限：當 \\(\\Delta x \\to 0\\) 時，\\(\\lim_{\\Delta x \\to 0}(2+\\Delta x) = 2\\)',
-            '得出結論：\\(f\'(1) = 2\\)'
-          ],
-          ans: '\\(f\'(1) = 2\\)',
-          variant: {
-            q: '【隨堂變式】求同一函數在 \\(x=3\\) 處的導數。',
-            ans: '\\(f\'(3) = 6\\)'
-          }
-        },
-        points: [
-          '<b>定義法三部曲</b>：求增量 → 算比值 → 取極限。',
-          '在約分之前，不可直接將 \\(\\Delta x = 0\\) 代入分母。'
-        ],
-        visual: (h) => {
-          h.innerHTML = SV.fbox([
-            { label: 'Step 1: 求差', tex: '\\Delta y = 2\\Delta x + (\\Delta x)^2', color: C, size: 16 },
-            { label: 'Step 2: 算商', tex: '\\frac{\\Delta y}{\\Delta x} = 2 + \\Delta x', color: AMB, size: 16 },
-            { label: 'Step 3: 取極限', tex: '\\lim_{\\Delta x \\to 0}(2 + \\Delta x) = 2', color: GRN, fill: '#f0fdf4', border: GRN, size: 19 }
-          ]);
-        },
-        caption: '解題核心：先化簡代數式消除不定型，再求極限。'
-      },
-
-      /* ---------- 10.1.2 導數的幾何意義 ---------- */
-      {
-        sec: '10.1.2', secName: '導數的幾何意義',
-        type: 'explore',
-        title: '割線的極限位置即為切線，斜率即為導數',
-        inquiry: '請拖動滑桿改變動點 Q 的位置，觀察割線 PQ 逼近切線的動態過程！',
-        points: [
-          '割線 \\(PQ\\) 的斜率是平均變化率：\\(k_{PQ} = \\frac{f(x)-f(x_0)}{x-x_0}\\)。',
-          '當點 \\(Q\\) 沿曲線逼近點 \\(P\\) 時，割線繞 \\(P\\) 轉動並趨向切線。',
-          '<b>幾何意義</b>：導數 \\(f\'(x_0)\\) 就是切線的<b>斜率</b>。'
-        ],
-        visual: (h) => {
-          h.innerHTML = `<div style="width:100%"><div id="fig"></div>
-            <div class="ictrl"><label>割點 Q 橫坐標 ＝ <span class="ival" id="xv">2.5</span>　割線斜率 ＝ <span class="ival" id="ksv">3.50</span></label>
-            <input type="range" id="xs" min="1.05" max="3.0" step="0.05" value="2.5"></div></div>`;
-          const fn = x => 0.5 * x * x + 0.5;
-          const x0 = 1;
-          const draw = () => {
-            const xq = +h.querySelector('#xs').value;
-            const slope = (fn(xq) - fn(x0)) / (xq - x0);
-            h.querySelector('#xv').textContent = xq.toFixed(2);
-            h.querySelector('#ksv').textContent = slope.toFixed(2);
-
-            const P = SV.plane({ x0: 45, y0: 25, w: 350, h: 220, xmin: -0.5, xmax: 3.5, ymin: -0.5, ymax: 5.5 });
-            const curve = SV.func(P, fn, [0, 3.2], { color: C });
-            const sec = SV.secant(P, fn, x0, xq, { color: RED, label1: 'P(1,1)', label2: 'Q' });
-            const tan = SV.tangent(P, fn, 1.0, x0, { color: GRN, label: '切線(k=1.00)' });
-            h.querySelector('#fig').innerHTML = svg('0 0 440 275', P.defs + P.svg + curve + sec.svg + tan.svg);
-          };
-          h.querySelector('#xs').oninput = draw; draw();
-        },
-        caption: '紅線為割線，綠線為極限切線。'
-      },
-      {
-        sec: '10.1.2', secName: '導數的幾何意義',
+        sec: '10.1.1', secName: '複數的概念',
         type: 'pitfall',
-        title: '連續曲線在每一點都必然存在切線嗎？',
+        title: '概念辨析 — 複數能比大小嗎？純虛數陷阱',
         points: [
-          '<b>經典反例</b>：函數 \\(f(x)=|x|\\) 在 \\(x=0\\) 處連續。',
-          '從右側逼近（\\(x>0\\)）割線斜率為 \\(+1\\)；從左側逼近為 \\(-1\\)。',
-          '左右極限不相等，極限不存在，故在原點<b>不可導</b>！'
+          '若兩複數不全是實數，<b>不能比較大小</b>（不可寫 \\(2+i > 1+i\\)）。',
+          '虛數不能與 \\(0\\) 比大小，因此虛數<b>沒有正負之分</b>。',
+          '「純虛數」的前提是：實部為 \\(0\\) <b>且</b>虛部不為 \\(0\\)！'
         ],
+        quiz: {
+          q: '下列關於複數的命題中，完全正確的是哪一項？',
+          options: [
+            'A. 若 z₁ = 3+2i, z₂ = 1+2i，則 z₁ > z₂',
+            'B. 虛數單位 i 是一個大於 0 的正數',
+            'C. 任意複數均由其唯一實部與虛部決定',
+            'D. 實部為 0 的複數必定是純虛數'
+          ],
+          ans: 2,
+          explain: '複數不可比較大小（A錯）；虛數無正負（B錯）；當實部虛部皆為0時是實數0而不是純虛數（D錯）。故選C。'
+        },
         visual: (h) => {
           SV.quiz(h, {
-            q: '若曲線在點 \\(x_0\\) 處連續，下列說法正確的是？',
+            q: '下列關於複數的命題中，完全正確的是哪一項？',
             options: [
-              'A. 該點必有切線且切線斜率存在',
-              'B. 該點不一定可導（圖形可能存在尖點折角）',
-              'C. 該點必定不可導'
+              'A. 若 z₁ = 3+2i, z₂ = 1+2i，則 z₁ > z₂',
+              'B. 虛數單位 i 是一個大於 0 的正數',
+              'C. 任意複數均由其唯一實部與虛部決定',
+              'D. 實部為 0 的複數必定是純虛數'
             ],
-            ans: 1,
-            explain: '連續只保證圖線沒有斷裂，但折角處（尖點）左右割線極限不同，不存在確定切線。'
+            ans: 2,
+            explain: '複數不可比較大小（A錯）；虛數無正負（B錯）；當實部虛部皆為0時是實數0而不是純虛數（D錯）。故選C。'
           });
         },
-        caption: '「可導必連續，連續不一定可導」是高考常考重點。'
+        caption: '虛數不能比大小是學習複數時最容易犯的直覺錯誤。'
+      },
+      /* ---------- 10.1.2 複數的幾何意義 ---------- */
+      {
+        sec: '10.1.2', secName: '複數的幾何意義',
+        type: 'example',
+        title: '典例剖析 — 參數討論求純虛數與模長',
+        example: {
+          q: '已知複數 \\(z = (m^2-1) + (m+1)i\\)（\\(m \\in \\mathbb{R}\\)），若 \\(z\\) 為純虛數，求實數 \\(m\\) 的值及模長 \\(|z|\\)。',
+          thinking: '純虛數條件是「實部為 0 且虛部不為 0」，務必檢驗虛部非零！',
+          hints: [
+            '第一步：令實部 \\(m^2-1 = 0\\)，解得 \\(m=1\\) 或 \\(m=-1\\)',
+            '第二步：檢驗虛部 \\(m+1 \\neq 0\\)，排除 \\(m=-1\\)',
+            '第三步：將 \\(m=1\\) 代入計算模長 \\(|z|=|2i|\\)'
+          ],
+          steps: [
+            '由實部為零：\\(m^2-1=0 \\implies m=1\\) 或 \\(m=-1\\)',
+            '由虛部非零：\\(m+1 \\neq 0 \\implies m \\neq -1\\)',
+            '綜合可得：\\(m = 1\\)',
+            '此時 \\(z = 2i\\)，模長 \\(|z| = \\sqrt{0^2+2^2} = 2\\)'
+          ],
+          ans: '\\(m = 1\\)，模長 \\(|z| = 2\\)',
+          variant: {
+            q: '【即堂變式】若該複數 \\(z\\) 為實數，求實數 \\(m\\) 的值。',
+            ans: '由虛部 \\(m+1=0\\) 得 \\(m=-1\\)（此時 \\(z=0\\) 為實數）。'
+          }
+        },
+        visual: (h) => {
+          const P = SV.complexPlane({ x0: 50, y0: 25, w: 340, h: 215, xmin: -3, xmax: 3, ymin: -1, ymax: 3, step: 1 });
+          const dot = SV.dot(P.X(0), P.Y(2), RED, 5);
+          const vec = SV.vector(P, 0, 0, 0, 2, C, 'Z(0,2)', { lx: 14, ly: 0 });
+          const arc = `<circle cx="${P.X(0)}" cy="${P.Y(0)}" r="${(2 * (340 / 6)).toFixed(1)}" fill="none" stroke="${GRN}" stroke-width="1.8" stroke-dasharray="4 3"/>`;
+          const note = SV.vlabel(P.X(1.5), P.Y(2.2), '軌跡 |z| = 2', GRN, 13);
+          h.innerHTML = svg('0 0 440 270', P.defs + P.svg + arc + dot + vec + note);
+        },
+        caption: '純虛數 Z(0,2) 位於虛軸正半軸上，模長即為點到原點距離 2。'
+      },
+      {
+        sec: '10.1.2', secName: '複數的幾何意義',
+        type: 'practice',
+        title: '隨堂檢測 — 複平面點的象限定位與共軛複數',
+        points: [
+          '點 \\(Z(a,b)\\) 的正負符號決定其在複平面所處象限。',
+          '共軛複數 \\(\\bar{z} = a-bi\\) 關於實軸對稱。',
+          '幾何軌跡：\\(|z|=r\\) 表示以原點為圓心、\\(r\\) 為半徑的圓。'
+        ],
+        quiz: {
+          q: '已知複數 z = -3 + 4i，其共軛複數 z̄ 在複平面對應的點位於第幾象限？模長 |z| 為何？',
+          options: [
+            'A. 第二象限，模長為 5',
+            'B. 第三象限，模長為 5',
+            'C. 第三象限，模長為 7',
+            'D. 第四象限，模長為 25'
+          ],
+          ans: 1,
+          explain: '共軛複數為 z̄ = -3 - 4i，對應點 (-3, -4) 位於第三象限；模長 |z| = √((-3)²+4²) = 5。故選B。'
+        },
+        visual: (h) => {
+          SV.quiz(h, {
+            q: '已知複數 z = -3 + 4i，其共軛複數 z̄ 在複平面對應的點位於第幾象限？模長 |z| 為何？',
+            options: [
+              'A. 第二象限，模長為 5',
+              'B. 第三象限，模長為 5',
+              'C. 第三象限，模長為 7',
+              'D. 第四象限，模長為 25'
+            ],
+            ans: 1,
+            explain: '共軛複數為 z̄ = -3 - 4i，對應點 (-3, -4) 位於第三象限；模長 |z| = √((-3)²+4²) = 5。故選B。'
+          });
+        },
+        caption: '掌握實軸對稱與模長距離定義，快速解讀複平面幾何位置。'
       }
     ]
   });
