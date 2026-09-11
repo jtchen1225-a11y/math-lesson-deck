@@ -112,17 +112,17 @@ python -m http.server 8890 --directory 導數新課
 
 ### Claude Code
 ```bash
-git clone https://github.com/mathruffian-dot/math-lesson-deck.git ~/.claude/skills/math-lesson-deck
+git clone https://github.com/jtchen1225-a11y/math-lesson-deck.git ~/.claude/skills/math-lesson-deck
 ```
 
 ### Google Antigravity
 ```bash
-git clone https://github.com/mathruffian-dot/math-lesson-deck.git ~/.gemini/config/skills/math-lesson-deck
+git clone https://github.com/jtchen1225-a11y/math-lesson-deck.git ~/.gemini/config/skills/math-lesson-deck
 ```
 
 ### OpenCode / Codex
 ```bash
-git clone https://github.com/mathruffian-dot/math-lesson-deck.git ~/.codex/skills/math-lesson-deck
+git clone https://github.com/jtchen1225-a11y/math-lesson-deck.git ~/.codex/skills/math-lesson-deck
 ```
 
 安裝後直接對 AI 說：**「幫我做這一章的新課簡報」**或**「把教科書 PDF 轉成新課互動投影片」**即可自動觸發！
