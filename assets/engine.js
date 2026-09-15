@@ -14,10 +14,24 @@
 
   let idx = 0;
 
-  // ---- MathJax 排版（載入前先重試，載入後自動補排版）----
+  // ---- MathJax 排版（以 Promise 鏈佇列化，載入前自動重試，避免並發衝突）----
+  let mathPromise = Promise.resolve();
+  function queueTypeset(el) {
+    if (!el) return Promise.resolve();
+    const els = Array.isArray(el) ? el.filter(Boolean) : [el];
+    if (!els.length) return Promise.resolve();
+    mathPromise = mathPromise.catch(() => {}).then(() => {
+      if (window.MathJax && MathJax.typesetPromise) {
+        return MathJax.typesetPromise(els);
+      }
+    }).catch(err => console.warn('MathJax error:', err));
+    return mathPromise;
+  }
+
   function typeset(el, tries = 0) {
+    if (!el) return;
     if (window.MathJax && MathJax.typesetPromise) {
-      MathJax.typesetPromise([el]).catch(() => {});
+      queueTypeset(el);
     } else if (tries < 60) {
       setTimeout(() => typeset(el, tries + 1), 200);
     }
@@ -49,8 +63,9 @@
   }
   // MathJax 排版完成後才量高縮放（公式高度需排版後才確定）
   function typesetAndFit(el, tries = 0) {
+    if (!el) return;
     if (window.MathJax && MathJax.typesetPromise) {
-      MathJax.typesetPromise([el]).then(fitSlide).catch(fitSlide);
+      queueTypeset(el).then(fitSlide).catch(fitSlide);
     } else if (tries < 60) {
       setTimeout(() => typesetAndFit(el, tries + 1), 200);
     } else { fitSlide(); }
@@ -232,6 +247,7 @@
       wrap.appendChild(items);
       tocEl.appendChild(wrap);
     });
+    typeset(tocEl);
   }
 
   function markTOC() {
@@ -254,6 +270,7 @@
           <div class="dv-list">${s.sections.map(x => `<span class="dv-chip">${x}</span>`).join('')}</div>
         </div>`;
       crumbEl.innerHTML = `第 ${s.ch} 章　<b>${s.title}</b>`;
+      typeset(crumbEl);
     } else {
       const typeLabels = {
         hook: '情境引入',
@@ -394,6 +411,7 @@
       if (exZoom) exZoom.onclick = () => openExampleModal(s);
 
       crumbEl.innerHTML = `第 ${s.ch} 章 · ${s.sec} <b>${s.title}</b>`;
+      typeset(crumbEl);
     }
 
     // 進度
